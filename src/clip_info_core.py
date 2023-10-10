@@ -103,7 +103,7 @@ class ClipInfoCore:
         new_xml_path = os.path.join(self._input_xml[0], self._data.std_name + '.' + self._input_xml[1].split('.')[-1])
 
         print(f"{os.path.join(*self._input_mp4)} -> {new_video_path}")
-        print(f"{os.path.join(*self._input_mp4)} -> {new_xml_path}")
+        print(f"{os.path.join(*self._input_xml)} -> {new_xml_path}")
 
         if not debug:
             os.rename(os.path.join(*self._input_mp4), new_video_path)
