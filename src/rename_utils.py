@@ -54,10 +54,6 @@ class RenameUtils:
         return video_pairs
 
     @staticmethod
-    def single_rename(video_pair: tuple, dry_run: bool = True):
-        ClipInfoCore(video_pair).apply_new_name(dry_run)
-
-    @staticmethod
     def batch_rename(video_pairs: list, dry_run: bool = True):
 
         if not video_pairs:
