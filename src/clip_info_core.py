@@ -20,7 +20,6 @@ class ClipInfoData:
         return '-'.join([
             self._short_creation_time(self.creation_time),
             f"{ClipInfoMap.resolution[self.resolution]}@{self.capture_fps}",
-            self.video_codec,
             ClipInfoMap.color_primaries[self.color_primaries],
             ClipInfoMap.gamma_equation[self.gamma_equation],
             ClipInfoMap.model_name[self.model_name],

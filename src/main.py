@@ -5,7 +5,7 @@
 
 @@Naming Rule:
     @Brief:
-        %y%m%d_%H%M%S-Resolution@FPS-Format-ColorPrimaries-TransferFunc-Model(-Note).MP4
+        %y%m%d_%H%M%S-Resolution@FPS-ColorPrimaries-TransferFunc-Model(-Note).MP4
 
     @Details:
         * %y              |  两位数的年份表示(00-99)
@@ -17,14 +17,13 @@
 
         * Resolution      |  分辨率
         * FPS             |  帧率
-        * Format          |  视频编码
         * ColorPrimaries  |  原色
         * TransferFunc    |  传递函数
         * Model           |  拍摄机型
         * (Note)          |  可选备注
 
     @Example:
-        220504_125850-4K@29.97-AVC-Rec709-xvYCC-SX107-乌鸦洗澡.MP4
+        220504_125850-4K@29.97-Rec709-xvYCC-SX107-乌鸦洗澡.MP4
 """
 
 from rename_utils import RenameUtils
