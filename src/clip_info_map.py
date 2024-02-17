@@ -19,9 +19,9 @@ class ClipInfoMap:
     color_primaries = {
         'rec709': 'Rec709',
         'rec2020': 'Rec2020',
-        's-gamut': 'SGamut',
-        's-gamut3': 'SGamut3',
-        's-gamut3-cine': 'SGamut3Ci',
+        's-gamut': 'SG',
+        's-gamut3': 'SG3',
+        's-gamut3-cine': 'SG3C',
     }
 
     # 传递函数映射表
@@ -31,7 +31,7 @@ class ClipInfoMap:
         'rec2100-hlg': 'HLG',
         's-log2': 'SLog2',
         's-log3': 'SLog3',
-        's-log3-cine': 'SLog3Ci',
+        's-log3-cine': 'SLog3C',
         'nxcam-still': 'Still',
         'ex-cine1': 'Cine1',
         'ex-cine2': 'Cine2',
