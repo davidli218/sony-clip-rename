@@ -1,0 +1,31 @@
+[model]
+ILCE-6400 = "SA640"
+ILCE-6700 = "SA670"
+DSC-RX100M7 = "SX107"
+ZV-E10 = "SZE10"
+
+[resolution]
+'1920,1080' = "FHD"
+'2560,1440' = "QHD"
+'3840,2160' = "4K"
+'7680,4320' = "8K"
+
+[color_primaries]
+rec709 = "R709"
+rec2020 = "R2020"
+s-gamut = "SG"
+s-gamut3 = "SG3"
+s-gamut3-cine = "SG3C"
+
+[gamma_equation]
+rec709 = "R709"
+rec709-xvycc = "xvYCC"
+rec2100-hlg = "HLG"
+s-log2 = "SLg2"
+s-log3 = "SLg3"
+s-log3-cine = "SLg3C"
+nxcam-still = "Still"
+ex-cine1 = "exCi1"
+ex-cine2 = "exCi2"
+s-cinetone = "SCiT"
+hlg-slog3ootf = "HLG"
