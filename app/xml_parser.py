@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from xml.dom import minidom
 
-specs_mapping_file = Path(__file__).parent / 'specs_mapping.toml'
+specs_mapping_file = Path(__file__).parent / 'res' / 'specs_mapping.toml'
 
 spec_dict = namedtuple(
     'SpecsDict',
