@@ -1,22 +1,22 @@
 import tomllib
+
 from collections import namedtuple
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from xml.dom import minidom
+from xml.etree import ElementTree
 
-specs_mapping_file = Path(__file__).parent / 'res' / 'specs_mapping.toml'
+SPEC_MAPPING_FILE = Path(__file__).parent / 'res' / 'specs_mapping.toml'
 
-spec_dict = namedtuple(
-    'SpecsDict',
-    ['model', 'resolution', 'color_primaries', 'gamma_equation']
-)
+SpecsDict = namedtuple('SpecsDict', ['model', 'resolution', 'color_primaries', 'gamma_equation'])
 
-with specs_mapping_file.open('rb') as f:
+with SPEC_MAPPING_FILE.open('rb') as f:
     load_dict = tomllib.load(f)
+
+    # Convert resolution from string to tuple
     load_dict['resolution'] = {tuple(map(int, k.split(','))): v for k, v in load_dict['resolution'].items()}
 
-    spec_dict = spec_dict(**load_dict)
+    spec_dict = SpecsDict(**load_dict)
 
 
 @dataclass
@@ -40,50 +40,49 @@ class ClipInfo:
 
 
 def __parse_fps(s: str) -> int | float:
-    s = s.rstrip('0')
-    return int(s.rstrip('.')) if s.endswith('.') else float(s)
+    s = s.rstrip('0p')
+    return int(s[:-1]) if s.endswith('.') else float(s)
 
 
 def parse_xml(xml_file: Path) -> ClipInfo:
     if not xml_file.exists():
         raise FileNotFoundError(f"File Not Found: {xml_file}")
 
-    dom = minidom.parse(str(xml_file))
-    root = dom.documentElement
+    tree = ElementTree.parse(str(xml_file))
+    root = tree.getroot()
 
-    tag_creation_date = root.getElementsByTagName('CreationDate')[0]
-    tag_video_frame = root.getElementsByTagName('VideoFrame')[0]
-    tag_video_layout = root.getElementsByTagName('VideoLayout')[0]
-    tag_device = root.getElementsByTagName('Device')[0]
-    tag_acquisition_record = root.getElementsByTagName('AcquisitionRecord')[0]
-    tag_item = tag_acquisition_record.getElementsByTagName('Item')
+    namespaces = {
+        '': 'urn:schemas-professionalDisc:nonRealTimeMeta:ver.2.20',
+        'lib': 'urn:schemas-professionalDisc:lib:ver.2.10',
+        'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+    }
 
-    att_value = tag_creation_date.getAttribute('value')
-    att_model_name = tag_device.getAttribute('modelName')
-    att_pixel = tag_video_layout.getAttribute('pixel')
-    att_num_of_vertical_line = tag_video_layout.getAttribute('numOfVerticalLine')
-    att_capture_fps = tag_video_frame.getAttribute('captureFps')
+    # 提取 CreationDate 中的 value
+    creation_date = root.find('CreationDate', namespaces).get('value')
 
-    d_creation_time = att_value
-    d_model_name = att_model_name
-    d_resolution = (int(att_pixel), int(att_num_of_vertical_line))
-    d_capture_fps = __parse_fps(att_capture_fps[:-1])
-    d_gamma_equation = None
-    d_color_primaries = None
+    # 提取 VideoFormat.VideoLayout 中的 pixel 和 numOfVerticalLine
+    video_layout = root.find('VideoFormat/VideoLayout', namespaces)
+    pixel_h = video_layout.get('pixel')
+    pixel_v = video_layout.get('numOfVerticalLine')
 
-    for item in tag_item:
-        if item.getAttribute('name') == 'CaptureGammaEquation':
-            d_gamma_equation = item.getAttribute('value')
-        elif item.getAttribute('name') == 'CaptureColorPrimaries':
-            d_color_primaries = item.getAttribute('value')
+    # 提取 VideoFormat.VideoFrame 中的 captureFps
+    video_frame = root.find('VideoFormat/VideoFrame', namespaces)
+    capture_fps = video_frame.get('captureFps')
 
-    dom.unlink()
+    # 提取 Device 中的 modelName
+    device = root.find('Device', namespaces)
+    device_model = device.get('modelName')
+
+    # 提取 AcquisitionRecord 中的 CaptureGammaEquation 和 CaptureColorPrimaries
+    metadata_set = root.find("AcquisitionRecord/Group[@name='CameraUnitMetadataSet']", namespaces)
+    capture_gamma_equation = metadata_set.find("Item[@name='CaptureGammaEquation']", namespaces).get('value')
+    capture_color_primaries = metadata_set.find("Item[@name='CaptureColorPrimaries']", namespaces).get('value')
 
     return ClipInfo(
-        creation_time=datetime.fromisoformat(d_creation_time),
-        model_name=d_model_name,
-        resolution=d_resolution,
-        capture_fps=d_capture_fps,
-        gamma_equation=d_gamma_equation,
-        color_primaries=d_color_primaries,
+        creation_time=datetime.fromisoformat(creation_date),
+        model_name=device_model,
+        resolution=(int(pixel_h), int(pixel_v)),
+        capture_fps=__parse_fps(capture_fps),
+        gamma_equation=capture_gamma_equation,
+        color_primaries=capture_color_primaries,
     )
