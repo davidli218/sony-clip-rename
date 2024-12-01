@@ -1,20 +1,27 @@
 import argparse
 from pathlib import Path
 
-from app import batch_rename
+from app.rename_utils import generate_tasks_from_dir
+from app.rename_utils import generate_tasks_from_file
+from app.rename_utils import process_tasks
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Batch rename Sony video files.')
-    parser.add_argument('work_dir', type=str, help='The directory to work in.')
-    parser.add_argument('-a', '--apply', action='store_true', help='Apply the rename.')
-    parser.add_argument('-f', '--force', action='store_true', help='Force rename.')
+    parser = argparse.ArgumentParser(description='Rename Sony camera clips to a more human-readable format.')
+    parser.add_argument('work_dest', help='Directory or file to process.')
+    parser.add_argument('-d', '--dry', action='store_true', help='Dry run.')
+    parser.add_argument('-s', '--strict', action='store_true', help='Strict mode.')
     args = parser.parse_args()
 
-    batch_rename(Path(args.work_dir), strict=not args.force, dry_run=not args.apply)
+    work_dest = Path(args.work_dest)
+    if work_dest.is_dir():
+        tasks = generate_tasks_from_dir(work_dest, strict=args.strict)
+    elif work_dest.is_file():
+        tasks = generate_tasks_from_file(work_dest, strict=args.strict)
+    else:
+        raise FileNotFoundError(f"File Not Found: {work_dest}")
 
-    if not args.apply:
-        print('\nDry run completed. Use -a or --apply to apply the rename.')
+    process_tasks(tasks, dry_run=args.dry)
 
 
 if __name__ == '__main__':
