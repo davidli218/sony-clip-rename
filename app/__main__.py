@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 
-from app.rename_utils import generate_tasks_from_dir
-from app.rename_utils import generate_tasks_from_file
-from app.rename_utils import process_tasks
+from app.task_pipeline import generate_tasks_from_dir
+from app.task_pipeline import generate_tasks_from_file
+from app.task_pipeline import process_tasks
 
 
 def main():
